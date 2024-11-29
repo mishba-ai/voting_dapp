@@ -125,3 +125,10 @@ pub struct Poll {
    pub poll_end:u64,
    pub candidate_amount:u64,
 }
+
+
+
+
+
+
+//to set everything local ,run  "solana config set -ul"
