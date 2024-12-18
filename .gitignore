@@ -35,3 +35,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 tmp
+
+# Sensitive data
+*.keypair
+*.json
+*.yml
+*.key
+*.pem
+
+test-ledger/
