@@ -77,7 +77,7 @@ pnpm anchor deploy --provider.cluster devnet
 
 ### web
 
-This is a React app that uses the Anchor generated client to interact with the Solana program.
+This is a Nectjs app that uses the Anchor generated client to interact with the Solana program.
 
 #### Commands
 
