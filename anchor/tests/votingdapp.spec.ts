@@ -6,7 +6,7 @@ import { BankrunProvider, startAnchor } from 'anchor-bankrun'
 
 const IDL = require('../target/idl/votingdapp.json')  // Loads the Interface Definition Language (IDL) file that describes the smart contract's methods and types. This is essential for type safety in interactions with the contract.
 
-const votingAddress = new PublicKey("AsjZ3kWAUSQRNt2pZVeJkywhZ6gpLpHZmJjduPmKZDZZ");
+const votingAddress = new PublicKey("FRJmEYh58FmPDWsMfQmZ2oXC1oTA6Ppe4YjjkegHSEbT");
 
 //A Jest function that groups related tests. It takes a string (the name of the test suite) and a callback function containing individual tests.
 describe('votingdapp', () => {
@@ -14,19 +14,22 @@ describe('votingdapp', () => {
 
   let context;
   let provider;
-  let votingProgram: Program<Votingdapp>;
+  anchor.setProvider(anchor.AnchorProvider.env()); //Sets the provider to use the local cluster environment.
+  let votingProgram: Program<Votingdapp> = anchor.workspace.Votingdapp as Program<Votingdapp>; //Creates a new instance of the Program class, which is used to interact with the smart contract.
 
   beforeAll(async () => {
-    context = await startAnchor("", [{ name: "votingdapp", programId: votingAddress }], []);  //Initializes the Anchor testing context. It sets up a local cluster environment where tests can run against a deployed version of your program
+    /*context = await startAnchor("", [{ name: "votingdapp", programId: votingAddress }], []);  //Initializes the Anchor testing context. It sets up a local cluster environment where tests can run against a deployed version of your program
 
     provider = new BankrunProvider(context); //This provider will handle transactions and account management during tests.
 
     votingProgram = new Program<Votingdapp>(
       IDL,
       provider //The provider created to facilitate interactions with the blockchain
-    );
+    );*/
   })
 
+  // Increase timeout for all tests
+  jest.setTimeout(30000);  // 30 seconds
   it('initialized Poll', async () => { //Another Jest function that defines an individual test case. The first argument is a description of what the test does, and the second argument is an asynchronous function containing the test logic.
 
     await votingProgram.methods.initializePoll(
@@ -50,41 +53,41 @@ describe('votingdapp', () => {
 
   it("initialize candidate", async () => {
     await votingProgram.methods.initializeCandidate(
-      "smooth",
+      "vanilla",
       new anchor.BN(1)
     ).rpc();
     await votingProgram.methods.initializeCandidate(
-      "crunchy",
+      "chocolate",
       new anchor.BN(1)
     ).rpc();
 
-    const [crunchyAddress] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("crunchy")], votingAddress);
+    const [chocolateAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("chocolate")], votingAddress);
 
-    const crunchyCandidate = await votingProgram.account.candidate.fetch(crunchyAddress);
+    const chocolateCandidate = await votingProgram.account.candidate.fetch(chocolateAddress);
 
-    console.log(crunchyCandidate);
-    expect(crunchyCandidate.candidateVotes.toNumber()).toEqual(0);
+    console.log(chocolateCandidate);
+    expect(chocolateCandidate.candidateVotes.toNumber()).toEqual(0);
 
-    const [smoothAddress] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("smooth")], votingAddress);
+    const [vanillaAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("vanilla")], votingAddress);
 
-    const smoothCandidate = await votingProgram.account.candidate.fetch(smoothAddress);
-    console.log(smoothCandidate);
-    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(0);
+    const vanillaCandidate = await votingProgram.account.candidate.fetch(vanillaAddress);
+    console.log(vanillaCandidate);
+    expect(vanillaCandidate.candidateVotes.toNumber()).toEqual(0);
   })
 
   it("vote", async () => {
     await votingProgram.methods.vote(
-      "smooth",
+      "vanilla",
       new anchor.BN(1)
     ).rpc();
 
-    const [smoothAddress] = PublicKey.findProgramAddressSync(
-      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("smooth")], votingAddress);
+    const [vanillaAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("vanilla")], votingAddress);
 
-    const smoothCandidate = await votingProgram.account.candidate.fetch(smoothAddress);
-    console.log(smoothCandidate);
-    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(1);
+    const vanillaCandidate = await votingProgram.account.candidate.fetch(vanillaAddress);
+    console.log(vanillaCandidate);
+    expect(vanillaCandidate.candidateVotes.toNumber()).toEqual(1);
   });
 })

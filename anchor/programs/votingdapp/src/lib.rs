@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("AsjZ3kWAUSQRNt2pZVeJkywhZ6gpLpHZmJjduPmKZDZZ");
+declare_id!("FRJmEYh58FmPDWsMfQmZ2oXC1oTA6Ppe4YjjkegHSEbT");
 
 #[program]
 pub mod votingdapp {
@@ -15,7 +15,9 @@ pub mod votingdapp {
     description:String,
     poll_start:u64,
     poll_end:u64) -> Result<()> {
-        let poll = &mut ctx.accounts.poll; //
+        let poll = &mut ctx.accounts.poll; // Allows modification of the poll account's state directly.
+        
+        //Sets various fields of the poll account based on input parameters.
         poll.poll_id = poll_id;
         poll.description = description;
         poll.poll_start = poll_start;
@@ -28,14 +30,21 @@ pub mod votingdapp {
     ) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate;
         let poll = &mut ctx.accounts.poll;
+
+        // Updates the candidate count and initializes candidate details.
         poll.candidate_amount += 1;
         candidate.candidate_name = candidate_name;
         candidate.candidate_votes = 0;
         Ok(())
     }
     
+
+    //Allows users to cast votes for candidates.
+
     pub fn vote(ctx:Context<Vote> , _candidate_name: String,_poll_id: u64) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate;
+
+        //Increments vote count and logs messages for tracking.
         candidate.candidate_votes += 1;
         msg!("Voted for candidate: {}", candidate.candidate_name);
         msg!("Candidate votes: {}", candidate.candidate_votes);
